@@ -1,3 +1,5 @@
+--Added python 3 support to library
+
 Infobip API Python client
 ============================
 
