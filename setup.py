@@ -43,7 +43,9 @@ mod_distutilscore.setup(
     packages=my_packages,
     package_dir={'infobip': 'infobip'},
     install_requires=[
-        'enum',
+        'enum-compat',
+		'urllib3',
+		'jsonpickle'
     ],
     keywords=[
         'infobip',

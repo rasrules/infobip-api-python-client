@@ -11,7 +11,7 @@ from infobip.api.model.omni.send.Language import Language
 
 class SmsData(DefaultObject):
     @property
-    @serializable(name="transliteration", type=unicode)
+    @serializable(name="transliteration", type=str)
     def transliteration(self):
         """
         Property is of type: unicode
@@ -49,7 +49,7 @@ class SmsData(DefaultObject):
         return self
 
     @property
-    @serializable(name="text", type=unicode)
+    @serializable(name="text", type=str)
     def text(self):
         """
         Property is of type: unicode

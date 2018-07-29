@@ -49,7 +49,8 @@ class serializable(object):
         self.date_format = date_format
 
     def __call__(self, method):
-        method.func_dict['serializable'] = self
+        #method.__dict__['serializable'] = self
+        method.__dict__['serializable'] = self
         return method
 
 
@@ -78,10 +79,10 @@ class DefaultObject(object):
                     f = False
                     s += u"%s" % o
                 s += u"]"
-            elif isinstance(v, unicode):
+            elif isinstance(v, str):
                 s += k + u"=\"" + v + u"\""
             else:
-                s += unicode(k) + u"=" + unicode(v)
+                s += str(k) + u"=" + str(v)
 
         s += u"}"
 
@@ -109,8 +110,8 @@ class DefaultObject(object):
             return res
 
         if isinstance(v, dict):
-            if serializable.type == basestring:
-                return unicode(v)
+            if serializable.type == bytes:
+                return str(v)
             if serializable.type == dict:
                 return v
             o = serializable.type()
@@ -119,7 +120,8 @@ class DefaultObject(object):
                 if not isinstance(attr, property):
                     continue
 
-                serializable = attr.fget.func_dict['serializable']
+                #serializable = attr.fget.__dict__['serializable']
+                serializable = attr.fget.__dict__['serializable']
                 k = serializable.name
                 if not k:
                     k = attr.fget.__name__
@@ -143,7 +145,7 @@ class DefaultObject(object):
             attr = getattr(type(self), p)
             if not isinstance(attr, property):
                 continue
-            serializable = attr.fget.func_dict['serializable']
+            serializable = attr.fget.__dict__['serializable']
             k = serializable.name
             if not k:
                 k = attr.fget.__name__
@@ -179,7 +181,7 @@ class DefaultObject(object):
     @classmethod
     def isdate(cls, fieldName):
         attr = getattr(cls, fieldName)
-        serializable = attr.fget.func_dict['serializable']
+        serializable = attr.fget.__dict__['serializable']
         is_date = serializable and (serializable.type == datetime)
         if not is_date:
             return False
@@ -194,7 +196,8 @@ class DefaultObject(object):
 
     @classmethod
     def from_JSON(cls, s):
-        vals = json.JSONDecoder().decode(s)
+        #vals = json.JSONDecoder().decode(s)
+        vals = json.loads(s)
         if vals == None:
             return None
 
@@ -204,7 +207,7 @@ class DefaultObject(object):
             if not isinstance(attr, property):
                 continue
 
-            serializable = attr.fget.func_dict['serializable']
+            serializable = attr.fget.__dict__['serializable']
             k = serializable.name
             if not k:
                 k = attr.fget.__name__

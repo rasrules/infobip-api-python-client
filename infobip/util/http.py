@@ -1,18 +1,19 @@
 import base64
 
-from exception import ApiException, ApiRequestError, ApiRequestErrorDetails
+from infobip.util.exception import ApiException, ApiRequestError, ApiRequestErrorDetails
 
 __author__ = 'mstipanov'
 
-import httplib
-import urllib
-from urlparse import urlparse
+import http.client as httplib
+import urllib3 as urllib
+from urllib.parse import urlparse
 import json
 
 class HttpClient:
 
     def deserialize(self, s, cls):
-        vals = json.JSONDecoder().decode(s)
+        #vals = json.JSONDecoder().decode(bytes(s, 'utf-8'))
+        vals = json.loads(s) #(bytes(s, 'utf-8'))
         return self.deserialize_map(vals, cls)
 
     def deserialize_map(self, vals, cls):
@@ -57,10 +58,14 @@ class HttpClient:
 
         headers = {}
         if username:
-            auth = base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
+            #auth = base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
+            auth_data1 = '%s:%s' % (username, password)
+            auth = base64.b64encode(bytes(auth_data1, 'utf-8')) #.replace('\n', '')
+            auth = auth.decode("utf-8") 
             headers["Authorization"] = "Basic %s" % auth
 
         if api_key:
+            print(api_key)
             headers["Authorization"] = "App %s" % api_key
 
         if token:
@@ -88,7 +93,7 @@ class HttpClient:
             raise ApiException(ApiRequestError(None, ApiRequestErrorDetails(response.reason + " - " + response_content)))
 
         contentType = response.getheader("Content-Type")
-        if contentType and contentType.startswith("application/json") and not basestring == valueType:
-            return valueType.from_JSON(response_content)
+        if contentType and contentType.startswith("application/json") and not bytes == valueType:
+            return valueType.from_JSON(response_content.decode('utf-8'))
 
         return response_content
